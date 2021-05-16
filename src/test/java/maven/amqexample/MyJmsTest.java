@@ -29,9 +29,9 @@ import org.springframework.jms.core.MessageCreator;
  * @author Ivan Krizsan
  */
 @TestInstance(Lifecycle.PER_CLASS)
- public class MyJmsTestIT {
+ public class MyJmsTest {
     /* Constant(s): */
-    public static final String AMQ_BROKER_URL = "tcp://localhost:61617";
+    public static final String AMQ_BROKER_URL = "tcp://localhost:61616";
     public static final String QUEUE_NAME = "testQueue";
 
     /* Instance variable(s): */

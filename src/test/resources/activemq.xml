@@ -1,30 +1,28 @@
-<beans
-        xmlns="http://www.springframework.org/schema/beans"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="ActiveMQData" useShutdownHook="false">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="XYZ" brokerId="N1" dataDirectory="ActiveMQData" useShutdownHook="false">
         <persistenceAdapter>
             <kahaDB directory="ActiveMQData/kahadb" journalMaxFileLength="32mb"/>
         </persistenceAdapter>
 
         <systemUsage>
             <systemUsage>
-               <memoryUsage>
-                   <memoryUsage limit="64 mb"/>
-               </memoryUsage>
-               <storeUsage>
-                  <storeUsage limit="10 gb"/>
-               </storeUsage>
-               <tempUsage>
-                  <tempUsage limit="5 gb"/>
-               </tempUsage>
+                <memoryUsage>
+                    <memoryUsage limit="64 mb"/>
+                </memoryUsage>
+                <storeUsage>
+                    <storeUsage limit="10 gb"/>
+                </storeUsage>
+                <tempUsage>
+                    <tempUsage limit="5 gb"/>
+                </tempUsage>
             </systemUsage>
         </systemUsage>
 
         <transportConnectors>
-            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=100"/>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61617?maximumConnections=100"/>
         </transportConnectors>
     </broker>
 </beans>
