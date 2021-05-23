@@ -25,6 +25,11 @@
             <version>${activemq.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency><!-- remove after test-->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.1</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -67,6 +72,10 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <parallel>all</parallel>
+                    <useUnlimitedThreads>true</useUnlimitedThreads>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

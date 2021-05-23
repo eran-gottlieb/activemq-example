@@ -1,5 +1,6 @@
 package maven.amqexample;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 
@@ -13,8 +14,9 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,23 +35,41 @@ import org.springframework.jms.core.MessageCreator;
     /* Constant(s): */
     public static final String AMQ_BROKER_URL = "tcp://localhost:61616";
     public static final String QUEUE_NAME = "testQueue";
+    public static final String RESOURCES_STRING = "./src/test/resources/";
 
     /* Instance variable(s): */
-    protected ConnectionFactory mActiveMQConnectionFactory;
-    protected JmsTemplate mJmsTemplate;
+    protected ConnectionFactory activeMQConnectionFactory;
+    protected JmsTemplate jmsTemplate;
+    org.apache.activemq.broker.BrokerService broker;
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
-        mActiveMQConnectionFactory = new ActiveMQConnectionFactory(AMQ_BROKER_URL);
-        mJmsTemplate = new JmsTemplate(mActiveMQConnectionFactory);
+ 
+        System.setProperty("javax.net.ssl.keyStore",RESOURCES_STRING + "broker.ks");
+        System.setProperty("javax.net.ssl.keyStorePassword","password");
+        System.setProperty("javax.net.ssl.trustStore",RESOURCES_STRING + "broker.ts");
+        System.setProperty("javax.net.ssl.trustStorePassword","password");
+
+        String brokerURL = AMQ_BROKER_URL;
+        try {
+            broker = org.apache.activemq.broker.BrokerFactory.createBroker(new URI("xbean:file:" + RESOURCES_STRING + "activemq.xml"));
+            broker.start();
+            brokerURL = broker.getTransportConnectorByName("ssl").getPublishableConnectString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Client Broker URI: "+ brokerURL);
+        activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
+        jmsTemplate = new JmsTemplate(activeMQConnectionFactory);
         final Destination theTestDestination = new ActiveMQQueue(QUEUE_NAME);
-        mJmsTemplate.setDefaultDestination(theTestDestination);
-        mJmsTemplate.setReceiveTimeout(500L);
+        jmsTemplate.setDefaultDestination(theTestDestination);
+        jmsTemplate.setReceiveTimeout(500L);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1,10,100})
-    public void someIntegrationTest(int num) throws Exception {
+    public void simpleTest(int num) throws Exception {
         System.out.println("Test starting...");
         sendMessages(num);
         browseMessages(num);
@@ -63,7 +83,7 @@ import org.springframework.jms.core.MessageCreator;
             final String theMessageString = "Message: " + theMessageIndex;
             // System.out.println("Sending message with text: " + theMessageString);
 
-            mJmsTemplate.send(new MessageCreator() {
+            jmsTemplate.send(new MessageCreator() {
                 public Message createMessage(Session inJmsSession) throws JMSException {
                     TextMessage theTextMessage = inJmsSession.createTextMessage(theMessageString);
                     theTextMessage.setIntProperty("messageNumber", theMessageIndex);
@@ -76,7 +96,7 @@ import org.springframework.jms.core.MessageCreator;
 
     public void browseMessages(int expected) throws JMSException {
 
-        int actual = mJmsTemplate.browse(new BrowserCallback<Integer>() {
+        int actual = jmsTemplate.browse(new BrowserCallback<Integer>() {
             public Integer doInJms(final Session session, final QueueBrowser browser) throws JMSException {
                 Enumeration<?> enumeration = browser.getEnumeration();
                 int counter = 0;
@@ -101,7 +121,7 @@ import org.springframework.jms.core.MessageCreator;
 
     protected void receiveMessages(int expected) throws Exception {
         int actual = 0;
-        Message theReceivedMessage = mJmsTemplate.receive();
+        Message theReceivedMessage = jmsTemplate.receive();
 
         while (theReceivedMessage != null) {
             if (theReceivedMessage instanceof TextMessage) {
@@ -110,9 +130,18 @@ import org.springframework.jms.core.MessageCreator;
                 // System.out.println("Received a message with text: " + theTextMessage.getText());
             }
 
-            theReceivedMessage = mJmsTemplate.receive();
+            theReceivedMessage = jmsTemplate.receive();
         }
         Assertions.assertEquals(expected, actual);
         System.out.println("All messages received!");
+    }
+
+    @AfterAll
+    protected void shutdown() {
+        try {
+            broker.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
