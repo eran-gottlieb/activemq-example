@@ -27,6 +27,7 @@
                         <publishedAddressPolicy clusterClientUriQuery="verifyHostName=false"/>
                 </publishedAddressPolicy>
             </transportConnector>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61617?maximumConnections=100"/>
         </transportConnectors>
     </broker>
 </beans>
