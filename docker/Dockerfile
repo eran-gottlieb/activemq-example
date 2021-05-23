@@ -1,5 +1,5 @@
 # docker build . -t activemq:5.16.2
-# ocker run -d -p 61616:61616 -p 8161:8161 activemq:5.16.2
+# docker run -d -p 61616:61616 -p 8161:8161 activemq:5.16.2
 FROM openjdk:8-jre
 
 ENV ACTIVEMQ_VERSION 5.16.2
