@@ -22,7 +22,7 @@
         </systemUsage>
 
         <transportConnectors>
-            <transportConnector name="ssl" uri="ssl://0.0.0.0:61619?maximumConnections=100">
+            <transportConnector name="ssl" uri="ssl://0.0.0.0:61619?maximumConnections=10">
                 <publishedAddressPolicy>
                         <publishedAddressPolicy clusterClientUriQuery="verifyHostName=false"/>
                 </publishedAddressPolicy>

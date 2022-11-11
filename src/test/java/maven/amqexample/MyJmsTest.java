@@ -1,19 +1,23 @@
 package maven.amqexample;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.broker.BrokerFactory;
+import org.apache.activemq.broker.BrokerService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,9 +25,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.jms.core.BrowserCallback;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 
 /**
  * Simple test case that sends and receives messages to/from a JMS broker.
@@ -39,8 +40,13 @@ import org.springframework.jms.core.MessageCreator;
 
     /* Instance variable(s): */
     protected ConnectionFactory activeMQConnectionFactory;
-    protected JmsTemplate jmsTemplate;
-    org.apache.activemq.broker.BrokerService broker;
+    protected BrokerService broker;
+    private Connection c;
+    private Session s;
+    private Queue q;
+    private MessageConsumer consumer;
+    private MessageProducer producer;
+    private QueueBrowser browser;
 
     @BeforeAll
     public void setUp() {
@@ -52,93 +58,96 @@ import org.springframework.jms.core.MessageCreator;
 
         String brokerURL = AMQ_BROKER_URL;
         try {
-            broker = org.apache.activemq.broker.BrokerFactory.createBroker(new URI("xbean:file:" + RESOURCES_STRING + "activemq.xml"));
+            broker = BrokerFactory.createBroker(new URI("xbean:file:" + RESOURCES_STRING + "activemq.xml"));
             broker.start();
             brokerURL = broker.getTransportConnectorByName("ssl").getPublishableConnectString();
+            activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
+            c = activeMQConnectionFactory.createConnection();
+            c.start();
+            s = c.createSession(true, Session.SESSION_TRANSACTED);
+            //s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            q = s.createQueue(QUEUE_NAME);
+            producer = s.createProducer(q);
+            consumer = s.createConsumer(q);
+            browser  = s.createBrowser(q);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-        System.out.println("Client Broker URI: "+ brokerURL);
-        activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
-        jmsTemplate = new JmsTemplate(activeMQConnectionFactory);
-        final Destination theTestDestination = new ActiveMQQueue(QUEUE_NAME);
-        jmsTemplate.setDefaultDestination(theTestDestination);
-        jmsTemplate.setReceiveTimeout(500L);
+    private int count() throws JMSException {
+        browser  = s.createBrowser(q);
+        int leftOver = 0;
+        Enumeration<?> e = browser.getEnumeration();
+        while( e.hasMoreElements() ) {
+            e.nextElement();
+            leftOver++;
+        }
+        browser.close();
+        return leftOver;
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1,10,100})
-    public void simpleTest(int num) throws Exception {
-        System.out.println("Test starting...");
+    @ValueSource(ints = {1000})
+    public void simpleTest(int num) throws Exception {        System.out.println("Test starting...");
+        System.out.println(count() + " browse messages in queue");
+        long t1 = System.currentTimeMillis();
         sendMessages(num);
-        browseMessages(num);
+        if (s.getTransacted()) s.commit();
+        System.out.println(count() + " browse messages in queue");
+        long t2 = System.currentTimeMillis();
         receiveMessages(num);
+        if (s.getTransacted()) s.commit();
+        System.out.println(count() + " browse messages in queue");
+        long t3 = System.currentTimeMillis();
+        //System.out.println(count() + " browse messages in queue");
+
+        String tx = String.format("%d min, %d sec", 
+        TimeUnit.MILLISECONDS.toMinutes(t2-t1),
+        TimeUnit.MILLISECONDS.toSeconds(t2-t1) - 
+        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(t2-t1)));
+
+        String rx = String.format("%d min, %d sec", 
+        TimeUnit.MILLISECONDS.toMinutes(t3-t2),
+        TimeUnit.MILLISECONDS.toSeconds(t3-t2) - 
+        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(t3-t2)));
+
+        System.out.println("send " + (t2-t1) +", "+ num);
+        System.out.println("receive " + (t3-t2) +", "+ num);
         System.out.println("Test done!");
     }
 
-    protected void sendMessages(int num) {
+    protected void sendMessages(int num) throws JMSException {
         for (int i = 1; i <= num; i++) {
             final int theMessageIndex = i;
             final String theMessageString = "Message: " + theMessageIndex;
-            // System.out.println("Sending message with text: " + theMessageString);
-
-            jmsTemplate.send(new MessageCreator() {
-                public Message createMessage(Session inJmsSession) throws JMSException {
-                    TextMessage theTextMessage = inJmsSession.createTextMessage(theMessageString);
-                    theTextMessage.setIntProperty("messageNumber", theMessageIndex);
-
-                    return theTextMessage;
-                }
-            });
+            //System.out.println("Sending message with text: " + theMessageString);
+            producer.send(s.createTextMessage(theMessageString));
         }
+        System.out.println(num + " messages sent!");
     }
-
-    public void browseMessages(int expected) throws JMSException {
-
-        int actual = jmsTemplate.browse(new BrowserCallback<Integer>() {
-            public Integer doInJms(final Session session, final QueueBrowser browser) throws JMSException {
-                Enumeration<?> enumeration = browser.getEnumeration();
-                int counter = 0;
-                while (enumeration.hasMoreElements()) {
-                    Message msg = (Message)enumeration.nextElement();
-                    // System.out.println(MessageFormat.format("\tFound : {0}", msg));
-                    counter += 1;
-                }
-                return counter;
-            }
-        });
-
-        if (actual == 0)
-            System.out.println("There are no messages");
-        else if (actual == 1)
-            System.out.println("There is one message");
-        else if (actual > 1)    
-            System.out.println(MessageFormat.format("There are {0} messages", actual));
-
-        Assertions.assertEquals(expected, actual);
-    }
-
     protected void receiveMessages(int expected) throws Exception {
         int actual = 0;
-        Message theReceivedMessage = jmsTemplate.receive();
-
+        Message theReceivedMessage = consumer.receive(1000);
         while (theReceivedMessage != null) {
-            if (theReceivedMessage instanceof TextMessage) {
+            if (theReceivedMessage instanceof TextMessage) {                
                 actual++;
-                // final TextMessage theTextMessage = (TextMessage)theReceivedMessage;
-                // System.out.println("Received a message with text: " + theTextMessage.getText());
+                //final TextMessage theTextMessage = (TextMessage)theReceivedMessage;
+                //System.out.println("Received a message with text: " + theTextMessage.getText());
             }
-
-            theReceivedMessage = jmsTemplate.receive();
+            if (expected == actual) break;
+            theReceivedMessage = consumer.receive(1000);
         }
         Assertions.assertEquals(expected, actual);
-        System.out.println("All messages received!");
+        System.out.println(actual + " messages received!");
     }
-
+ 
     @AfterAll
     protected void shutdown() {
         try {
+            consumer.close();
+            s.close();
+            c.close();
             broker.stop();
         } catch (Exception e) {
             e.printStackTrace();
