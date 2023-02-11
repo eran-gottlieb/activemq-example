@@ -12,8 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <activemq.version>5.17.2</activemq.version>
+        <activemq.version>5.17.3</activemq.version>
         <junit.version>5.8.2</junit.version>
+        <log4j.version>2.19.0</log4j.version>
     </properties>
 
     <dependencies>
@@ -26,19 +27,19 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.18.0</version>
+            <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.18.0</version>
+            <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-jcl</artifactId>
-            <version>2.18.0</version>
+            <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency><!-- remove after test-->
