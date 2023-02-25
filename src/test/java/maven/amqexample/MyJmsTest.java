@@ -89,7 +89,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
     @ParameterizedTest
     @ValueSource(ints = {1000})
-    public void simpleTest(int num) throws Exception {        System.out.println("Test starting...");
+    public void simpleTest(int num) throws Exception {        
+        System.out.println("Test starting...");
         System.out.println(count() + " browse messages in queue");
         long t1 = System.currentTimeMillis();
         sendMessages(num);
