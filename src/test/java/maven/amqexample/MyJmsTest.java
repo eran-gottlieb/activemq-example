@@ -2,7 +2,6 @@ package maven.amqexample;
 
 import java.net.URI;
 import java.util.Enumeration;
-import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -101,19 +100,8 @@ import org.junit.jupiter.params.provider.ValueSource;
         if (s.getTransacted()) s.commit();
         System.out.println(count() + " browse messages in queue");
         long t3 = System.currentTimeMillis();
-        //System.out.println(count() + " browse messages in queue");
 
-        String tx = String.format("%d min, %d sec", 
-        TimeUnit.MILLISECONDS.toMinutes(t2-t1),
-        TimeUnit.MILLISECONDS.toSeconds(t2-t1) - 
-        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(t2-t1)));
-
-        String rx = String.format("%d min, %d sec", 
-        TimeUnit.MILLISECONDS.toMinutes(t3-t2),
-        TimeUnit.MILLISECONDS.toSeconds(t3-t2) - 
-        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(t3-t2)));
-
-        System.out.println("send " + (t2-t1) +", "+ num);
+        System.out.println("send " + (t2-t1) +", "+ num) ;
         System.out.println("receive " + (t3-t2) +", "+ num);
         System.out.println("Test done!");
     }
