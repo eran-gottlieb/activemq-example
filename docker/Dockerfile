@@ -1,6 +1,6 @@
 # docker build . -t activemq:5.18.2
 # docker run -d -p 61616:61616 -p 8161:8161 activemq:5.18.2
-FROM openjdk:11-jre
+FROM amazoncorretto:11-al2023-headless
 
 ENV ACTIVEMQ_VERSION 5.18.2
 ENV ACTIVEMQ apache-activemq-$ACTIVEMQ_VERSION
@@ -17,7 +17,7 @@ RUN if [ "$SHA512_VAL" != "$(sha512sum $ACTIVEMQ-bin.tar.gz | awk '{print($1)}')
         echo "sha512 values doesn't match! exiting."  && \
         exit 1; \
     fi;
-
+RUN dnf -y install tar gzip shadow-utils
 RUN tar xzf $ACTIVEMQ-bin.tar.gz -C  /opt && \
     mv /opt/$ACTIVEMQ $ACTIVEMQ_HOME && \
     useradd -r -M -d $ACTIVEMQ_HOME activemq && \
