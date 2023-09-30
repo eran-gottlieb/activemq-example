@@ -73,7 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
      * @param expected number of messages in queue
      */
     public void browseMessages(int expected) {
-        int actual = mJmsTemplate.browse((session, browser) -> {
+        Integer actual = mJmsTemplate.browse((session, browser) -> {
             Enumeration<?> enumeration = browser.getEnumeration();
             int counter = 0;
             while (enumeration.hasMoreElements()) {
@@ -83,6 +83,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
             }
             return counter;
         });
+
+        if (actual == null) {
+            throw new NullPointerException();
+        }
 
         if (actual == 0)
             System.out.println("There are no messages");
