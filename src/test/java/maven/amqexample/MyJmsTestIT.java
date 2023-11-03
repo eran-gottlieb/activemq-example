@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(Lifecycle.PER_CLASS)
  public class MyJmsTestIT {
     /* Constant(s): */
-    public static final String AMQ_BROKER_URL = "tcp://localhost:61617";
+    public static final String AMQ_BROKER_URL = "auto://0.0.0.0:61617";
     public static final String QUEUE_NAME = "testQueue";
 
     /* Instance variable(s): */

@@ -33,7 +33,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 @TestInstance(Lifecycle.PER_CLASS)
  public class MyJmsTest {
     /* Constant(s): */
-    public static final String AMQ_BROKER_URL = "tcp://localhost:61616";
     public static final String QUEUE_NAME = "testQueue";
     public static final String RESOURCES_STRING = "./src/test/resources/";
 
@@ -55,11 +54,11 @@ import org.junit.jupiter.params.provider.ValueSource;
         System.setProperty("javax.net.ssl.trustStore",RESOURCES_STRING + "broker.ts");
         System.setProperty("javax.net.ssl.trustStorePassword","password");
 
-        String brokerURL = AMQ_BROKER_URL;
+        String brokerURL;
         try {
             broker = BrokerFactory.createBroker(new URI("xbean:file:" + RESOURCES_STRING + "activemq.xml"));
             broker.start();
-            brokerURL = broker.getTransportConnectorByName("ssl").getPublishableConnectString();
+            brokerURL = broker.getTransportConnectorByName("nio+ssl").getPublishableConnectString();
             activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
             c = activeMQConnectionFactory.createConnection();
             c.start();
