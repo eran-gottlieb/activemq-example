@@ -21,17 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Ivan Krizsan
  */
 @TestInstance(Lifecycle.PER_CLASS)
- public class MyJmsTestIT {
+ class MyJmsTestIT {
     /* Constant(s): */
-    public static final String AMQ_BROKER_URL = "auto://0.0.0.0:61617";
-    public static final String QUEUE_NAME = "testQueue";
+    static final String AMQ_BROKER_URL = "auto://0.0.0.0:61617";
+    static final String QUEUE_NAME = "testQueue";
 
     /* Instance variable(s): */
     protected ConnectionFactory mActiveMQConnectionFactory;
     protected JmsTemplate mJmsTemplate;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mActiveMQConnectionFactory = new ActiveMQConnectionFactory(AMQ_BROKER_URL);
         mJmsTemplate = new JmsTemplate(mActiveMQConnectionFactory);
         final Destination theTestDestination = new ActiveMQQueue(QUEUE_NAME);
@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     //@Disabled
     @ParameterizedTest
     @ValueSource(ints = {1,10,100})
-    public void someIntegrationTest(int num) throws JMSException {
+    void someIntegrationTest(int num) throws JMSException {
         System.out.println("Test starting...");
         sendMessages(num);
         browseMessages(num);
@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
      * 
      * @param num number of sent messages.
      */
-    protected void sendMessages(int num) {
+    void sendMessages(int num) {
         for (int i = 1; i <= num; i++) {
             final int theMessageIndex = i;
             final String theMessageString = "Message: " + theMessageIndex;
@@ -72,7 +72,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
      * 
      * @param expected number of messages in queue
      */
-    public void browseMessages(int expected) {
+    void browseMessages(int expected) {
         Integer actual = mJmsTemplate.browse((session, browser) -> {
             Enumeration<?> enumeration = browser.getEnumeration();
             int counter = 0;
@@ -102,7 +102,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
      * 
      * @param expected num of messages to receive
      */
-    protected void receiveMessages(int expected) throws JMSException {
+    void receiveMessages(int expected) throws JMSException {
         int actual = 0;
         Message theReceivedMessage = mJmsTemplate.receive();
 
