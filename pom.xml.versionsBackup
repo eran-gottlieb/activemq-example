@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <activemq.version>5.18.3</activemq.version>
-        <junit.version>5.10.1</junit.version>
+        <junit.version>5.10.0</junit.version>
         <log4j.version>3.0.0-alpha1</log4j.version>
         <jackson-databind.version>2.16.0-rc1</jackson-databind.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
@@ -30,8 +30,8 @@
         <duplicate-finder-maven-plugin.version>2.0.1</duplicate-finder-maven-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.2.1</maven-failsafe-plugin.version>
         <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
     </properties>
 
