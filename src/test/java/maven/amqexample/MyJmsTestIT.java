@@ -1,5 +1,10 @@
 package maven.amqexample;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.text.MessageFormat;
+import java.util.Enumeration;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,11 +14,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.jms.core.JmsTemplate;
 
-import jakarta.jms.*;
-import java.text.MessageFormat;
-import java.util.Enumeration;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 /**
  * Simple test case that sends and receives messages to/from a JMS broker.
