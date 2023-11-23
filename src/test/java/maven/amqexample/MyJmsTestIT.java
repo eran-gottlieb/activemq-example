@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.jms.core.JmsTemplate;
 
-import javax.jms.*;
+import jakarta.jms.*;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 
