@@ -13,14 +13,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <activemq.version>6.0.0</activemq.version>
-        <junit.version>5.10.1</junit.version>
-        <log4j.version>3.0.0-alpha1</log4j.version>
-        <jackson-databind.version>2.16.0</jackson-databind.version>
+        <activemq.version>6.1.0</activemq.version>
+        <junit.version>5.10.2</junit.version>
+        <log4j.version>3.0.0-beta1</log4j.version>
+        <jackson-databind.version>2.17.0</jackson-databind.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-site-plugin.version>4.0.0-M11</maven-site-plugin.version>
+        <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
         <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
-        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
@@ -29,9 +29,9 @@
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
         <duplicate-finder-maven-plugin.version>2.0.1</duplicate-finder-maven-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-project-info-reports-plugin.version>3.5.0</maven-project-info-reports-plugin.version>
     </properties>
 
@@ -288,6 +288,9 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
+            <configuration>
+                <ignoredVersions>.*-M.*,.*-beta.*|.*-alpha.*,.*-SNAPSHOT</ignoredVersions>
+            </configuration>
             <reportSets>
               <reportSet>
                 <reports>
@@ -297,7 +300,7 @@
                 </reports>
               </reportSet>
             </reportSets>
-          </plugin>
+        </plugin>
         </plugins>
     </reporting>
 
