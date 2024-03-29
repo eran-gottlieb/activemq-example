@@ -1,7 +1,11 @@
 package maven.amqexample;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerFactory;
@@ -19,6 +23,7 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageListener;
 import jakarta.jms.MessageProducer;
 import jakarta.jms.Queue;
 import jakarta.jms.QueueBrowser;
@@ -91,7 +96,7 @@ import jakarta.jms.TextMessage;
         System.out.println("Test starting...");
         System.out.println(count() + " browse messages in queue");
         long t1 = System.currentTimeMillis();
-        sendMessages(num);
+        sendFastMessages(num);
         if (s.getTransacted()) s.commit();
         System.out.println(count() + " browse messages in queue");
         long t2 = System.currentTimeMillis();
@@ -105,7 +110,32 @@ import jakarta.jms.TextMessage;
         System.out.println("Test done!");
     }
 
-    protected void sendMessages(int num) throws JMSException {
+    protected void sendFastMessages(int num) throws JMSException {
+        final int batchSize = 100; // Adjust this value based on your needs
+        List<TextMessage> batch = new ArrayList<>(batchSize);
+
+        for (int i = 1; i <= num; i++) {
+            final String theMessageString = "Message: " + i;
+            TextMessage message = s.createTextMessage(theMessageString);
+            batch.add(message);
+
+            if (i % batchSize == 0 || i == num) {
+                // Send all messages in the batch
+                for (TextMessage msg : batch) {
+                    producer.send(msg);
+                }
+                // If the session is transacted, commit it to ensure that all messages in the batch are sent
+                if (s.getTransacted()) {
+                    s.commit();
+                }
+                // Clear the batch
+                batch.clear();
+            }
+        }
+        System.out.println(num + " messages sent!");
+    }
+
+    protected void sendSlowMessages(int num) throws JMSException {
         for (int i = 1; i <= num; i++) {
             final int theMessageIndex = i;
             final String theMessageString = "Message: " + theMessageIndex;
@@ -114,22 +144,32 @@ import jakarta.jms.TextMessage;
         }
         System.out.println(num + " messages sent!");
     }
+
     protected void receiveMessages(int expected) throws Exception {
-        int actual = 0;
-        Message theReceivedMessage = consumer.receive(1000);
-        while (theReceivedMessage != null) {
-            if (theReceivedMessage instanceof TextMessage) {                
-                actual++;
-                //final TextMessage theTextMessage = (TextMessage)theReceivedMessage;
-                //System.out.println("Received a message with text: " + theTextMessage.getText());
+        AtomicInteger actual = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(expected);
+
+        MessageListener listener = new MessageListener() {
+            public void onMessage(Message message) {
+                if (message instanceof TextMessage) {
+                    actual.incrementAndGet();
+                    latch.countDown();
+                }
             }
-            if (expected == actual) break;
-            theReceivedMessage = consumer.receive(1000);
-        }
-        Assertions.assertEquals(expected, actual);
-        System.out.println(actual + " messages received!");
-    }
- 
+        };
+
+        consumer.setMessageListener(listener);
+
+        // Wait for all messages to be received
+        latch.await();
+
+        Assertions.assertEquals(expected, actual.get());
+        System.out.println(actual.get() + " messages received!");
+
+        // Don't forget to remove the listener when you're done
+        consumer.setMessageListener(null);
+    } 
+
     @AfterAll
     protected void shutdown() {
         try {
