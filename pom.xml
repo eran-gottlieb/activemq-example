@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <activemq.version>6.1.0</activemq.version>
+        <activemq.version>6.1.1</activemq.version>
         <junit.version>5.10.2</junit.version>
         <log4j.version>3.0.0-beta1</log4j.version>
         <jackson-databind.version>2.17.0</jackson-databind.version>
