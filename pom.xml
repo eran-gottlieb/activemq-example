@@ -27,6 +27,7 @@
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
         <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
+        <dependency-versions-check-maven-plugin.version>4.0.1</dependency-versions-check-maven-plugin.version>
         <duplicate-finder-maven-plugin.version>2.0.1</duplicate-finder-maven-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -137,6 +138,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.basepom.maven</groupId>
+                    <artifactId>dependency-versions-check-maven-plugin</artifactId>
+                    <version>${dependency-versions-check-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.basepom.maven</groupId>
                     <artifactId>duplicate-finder-maven-plugin</artifactId>
                     <version>${duplicate-finder-maven-plugin.version}</version>
                 </plugin>
@@ -186,6 +192,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <ignoredVersions>.*-M.*,.*-RC.*,.*-beta.*|.*-alpha.*,.*-SNAPSHOT</ignoredVersions>
+                </configuration>
+            </plugin>
+
             <!--
                 Starts an minimal embedded ActiveMQ broker for the test.
             -->
@@ -283,6 +297,19 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.basepom.maven</groupId>
+                <artifactId>dependency-versions-check-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dependency-versions-check-maven-plugin</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -295,7 +322,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
             <configuration>
-                <ignoredVersions>.*-M.*,.*-beta.*|.*-alpha.*,.*-SNAPSHOT</ignoredVersions>
+                <ignoredVersions>.*-M.*,.*-RC.*,.*-beta.*|.*-alpha.*,.*-SNAPSHOT</ignoredVersions>
             </configuration>
             <reportSets>
               <reportSet>
