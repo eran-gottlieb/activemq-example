@@ -2,7 +2,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="XYZ" brokerId="N1" dataDirectory="ActiveMQData" useShutdownHook="false">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="XYZ" brokerId="N1" dataDirectory="ActiveMQData" useShutdownHook="false" schedulerSupport="true">
         <persistenceAdapter>
             <kahaDB directory="ActiveMQData/kahadb" journalMaxFileLength="32mb"/>
         </persistenceAdapter>

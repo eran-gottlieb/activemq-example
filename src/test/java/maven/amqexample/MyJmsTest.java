@@ -1,5 +1,6 @@
 package maven.amqexample;
 
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -58,6 +59,9 @@ import jakarta.jms.TextMessage;
         System.setProperty("javax.net.ssl.keyStorePassword","password");
         System.setProperty("javax.net.ssl.trustStore",RESOURCES_STRING + "broker.ts");
         System.setProperty("javax.net.ssl.trustStorePassword","password");
+
+        //System.getProperties().list(System.out);
+        System.getProperties().entrySet().forEach(System.out::println);
 
         String brokerURL;
         try {
