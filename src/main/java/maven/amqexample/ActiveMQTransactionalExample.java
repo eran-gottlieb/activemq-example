@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 public class ActiveMQTransactionalExample {
 
     private static final String BROKER_URL = "tcp://localhost:61616";
-    private static final String DESTINATION = "TEST.QUEUE"; 
+    private static final String DESTINATION = "TEST.QUEUE";
     
     public static void main(String[] args) throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
