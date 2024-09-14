@@ -65,7 +65,7 @@ public class ActiveMQTransactionalExample {
             producer = session.createProducer(destination);
             int sentCount = 0;
 
-            for (int i=0;i<(10*1000000); i++) {
+            for (int i=0;i<(.2*1000000); i++) {
                 // Create and send a message
                 TextMessage message = session.createTextMessage("Hello from producer! " + (i+1));
                 producer.send(message);
