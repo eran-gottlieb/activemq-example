@@ -1,6 +1,5 @@
 package maven.amqexample;
 
-import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -60,7 +59,6 @@ import jakarta.jms.TextMessage;
         System.setProperty("javax.net.ssl.trustStore",RESOURCES_STRING + "broker.ts");
         System.setProperty("javax.net.ssl.trustStorePassword","password");
 
-        //System.getProperties().list(System.out);
         System.getProperties().entrySet().forEach(System.out::println);
 
         String brokerURL;
@@ -72,7 +70,6 @@ import jakarta.jms.TextMessage;
             c = activeMQConnectionFactory.createConnection();
             c.start();
             s = c.createSession(true, Session.SESSION_TRANSACTED);
-            //s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
             q = s.createQueue(QUEUE_NAME);
             producer = s.createProducer(q);
             consumer = s.createConsumer(q);
@@ -83,14 +80,14 @@ import jakarta.jms.TextMessage;
     }
 
     private int count() throws JMSException {
-        browser  = s.createBrowser(q);
+        //browser  = s.createBrowser(q);
         int leftOver = 0;
         Enumeration<?> e = browser.getEnumeration();
         while( e.hasMoreElements() ) {
             e.nextElement();
             leftOver++;
         }
-        browser.close();
+        //browser.close();
         return leftOver;
     }
 
@@ -143,7 +140,6 @@ import jakarta.jms.TextMessage;
         for (int i = 1; i <= num; i++) {
             final int theMessageIndex = i;
             final String theMessageString = "Message: " + theMessageIndex;
-            //System.out.println("Sending message with text: " + theMessageString);
             producer.send(s.createTextMessage(theMessageString));
         }
         System.out.println(num + " messages sent!");
@@ -177,8 +173,6 @@ import jakarta.jms.TextMessage;
     @AfterAll
     protected void shutdown() {
         try {
-            consumer.close();
-            s.close();
             c.close();
             broker.stop();
         } catch (Exception e) {

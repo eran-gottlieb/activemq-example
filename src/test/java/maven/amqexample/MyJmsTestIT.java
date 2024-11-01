@@ -62,7 +62,7 @@ import jakarta.jms.TextMessage;
         for (int i = 1; i <= num; i++) {
             final int theMessageIndex = i;
             final String theMessageString = "Message: " + theMessageIndex;
-            // System.out.println("Sending message with text: " + theMessageString);
+            System.out.println("Sending message with text: " + theMessageString);
 
             mJmsTemplate.send(inJmsSession -> {
                 TextMessage theTextMessage = inJmsSession.createTextMessage(theMessageString);
