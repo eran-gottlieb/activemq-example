@@ -36,7 +36,7 @@ public class QueueSizeChecker {
             QueueBrowser browser = session.createBrowser(queue);
 
             // Count the number of messages
-            Enumeration messages = browser.getEnumeration();
+            Enumeration<?> messages = browser.getEnumeration();
             int messageCount = 0;
             while (messages.hasMoreElements()) {
                 messages.nextElement();
