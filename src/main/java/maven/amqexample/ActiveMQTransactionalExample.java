@@ -25,7 +25,7 @@ public class ActiveMQTransactionalExample {
 
     public static void main(String[] args) throws InterruptedException {
         //comment to use standalone broker.
-       startBroker();
+        startBroker();
 
         int count = NUM_OF_CONSUMERS;
         CountDownLatch consumersLatch = new CountDownLatch(count);
