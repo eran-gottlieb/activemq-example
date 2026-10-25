@@ -1,8 +1,8 @@
 #!/usr/bin/env zsh
-# Helper to set JAVA_HOME to JDK 21 for this shell and run the build
+# Helper to set JAVA_HOME to JDK 25 for this shell and run the build
 set -euo pipefail
 
-JAVA_HOME=$(/usr/libexec/java_home -v21)
+JAVA_HOME=$(/usr/libexec/java_home -v25)
 export JAVA_HOME
 export PATH="$JAVA_HOME/bin:$PATH"
 
